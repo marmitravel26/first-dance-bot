@@ -198,13 +198,13 @@ def contact_handler(message):
     studio = user_data[chat_id]["studio"]
 
     bot.send_message(
-        ADMIN_ID,
-        f"🔔 Новая заявка на пробное занятие\n\n"
-        f"Имя: {name}\n"
-        f"Возраст: {age}\n"
-        f"Группа: Общая группа\n"
-        f"Филиал: {studio}\n"
-        f"Телефон: {phone}"
+    ADMIN_ID,
+    f"🔔 Новая заявка на пробное занятие\n\n"
+    f"Имя: {name}\n"
+    f"Возраст: {age}\n"
+    f"Группа: {'🧒 Детская группа (4-8 лет)' if 4 <= age <= 8 else '🧑 Старшая группа'}\n"
+    f"Филиал: {studio}\n"
+    f"Телефон: {phone}"
     )
 
     markup = types.InlineKeyboardMarkup()
@@ -258,25 +258,28 @@ def answer(message):
             return
 
         age = int(message.text)
+    if 4 <= age <= 8:
+     group = "👶 Детская группа (4–8 лет)"
+    else:
+     group = "🧑 Старшая группа"
+     user_data[chat_id]["age"] = age
 
-        user_data[chat_id]["age"] = age
+     markup = types.InlineKeyboardMarkup()
 
-        markup = types.InlineKeyboardMarkup()
-
-        btn1 = types.InlineKeyboardButton(
+    btn1 = types.InlineKeyboardButton(
             "🏫 Потанина 226",
             callback_data="studio1"
         )
 
-        btn2 = types.InlineKeyboardButton(
+    btn2 = types.InlineKeyboardButton(
             "🏫 Боткина 20",
             callback_data="studio2"
         )
 
-        markup.add(btn1)
-        markup.add(btn2)
+    markup.add(btn1)
+    markup.add(btn2)
 
-        bot.send_message(
+    bot.send_message(
             chat_id,
             "🎉 Отлично!\n\n"
             "Выберите филиал:",
