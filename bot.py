@@ -51,7 +51,7 @@ def start(message):
 
     bot.send_message(
         message.chat.id,
-        "💃 Добро пожаловать в школу танцев!\n\n"
+        "💃 Добро пожаловать в студию танцев First!\n\n"
         "✨ Первое пробное занятие бесплатно\n\n"
         "Выберите действие:",
         reply_markup=markup
@@ -76,7 +76,7 @@ def callback(call):
 
         bot.send_message(
             chat_id,
-            "📞 Телефон:\n+7 707 595 51 52"
+            "📞 Телефон:\n+7 777 396 76 98"
         )
 
     elif call.data == "address":
@@ -84,7 +84,7 @@ def callback(call):
         bot.send_message(
             chat_id,
             "📍 Наши филиалы:\n\n"
-            "🏫 Рыскулова (за Magnum)\n"
+            "🏫 Потанина 226\n"
             "🏫 Боткина 20"
         )
 
@@ -92,18 +92,18 @@ def callback(call):
 
      bot.send_message(
         chat_id,
-        "📅 Расписание занятий\n\n"
+        "🗓️ Расписание занятий\n\n"
 
-        "🏫 Боткина 20\n"
-        "Понедельник — 19:00–20:00\n"
-        "Среда — 19:00–20:00\n"
-        "Пятница — 19:00–20:00\n\n"
+        "📍 Боткина, 20\n"
+        "👧 Детская группа\n"
+        "Вторник, четверг — 18:30-20:00\n\n"
 
-        "🏫 Рыскулова (за Magnum)\n"
-        "Вторник — 19:00–20:30\n"
-        "Четверг — 19:00–20:30\n\n"
+        "🕺 Старшие дети и взрослые\n"
+        "Вторник, четверг — 20:00-21:30\n\n"
 
-        "👧 Общая группа для всех возрастов"
+        "📍 Потанина, 226 (школа №102)\n"
+        "👨‍👩‍👧 Общая группа\n"
+        "Понедельник, среда, пятница — 19:30-20:30"
     )
 
     elif call.data == "price":
@@ -111,10 +111,10 @@ def callback(call):
      bot.send_message(
         chat_id,
         "💰 Стоимость:\n\n"
+        "🏫 Потанина 226\n"
+        "12 занятий по 1 часу — 27 000 ₸\n\n"
         "🏫 Боткина 20\n"
-        "12 занятий по 1 часу — 25 000 ₸\n\n"
-        "🏫 Рыскулова (за Magnum)\n"
-        "8 занятий по 1.5 часа — 25 000 ₸\n\n"
+        "8 занятий по 1.5 часа — 27 000 ₸\n\n"
         "🎁 Первое пробное занятие бесплатно"
     )
 
@@ -137,7 +137,7 @@ def callback(call):
 
     elif call.data == "studio1":
 
-        user_data[chat_id]["studio"] = "Рыскулова (за Magnum)"
+        user_data[chat_id]["studio"] = "Потанина 226"
 
         phone_markup = types.ReplyKeyboardMarkup(
             resize_keyboard=True,
@@ -261,7 +261,7 @@ def answer(message):
         markup = types.InlineKeyboardMarkup()
 
         btn1 = types.InlineKeyboardButton(
-            "🏫 Рыскулова (за Magnum)",
+            "🏫 Потанина 226",
             callback_data="studio1"
         )
 
