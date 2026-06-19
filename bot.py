@@ -196,13 +196,13 @@ def contact_handler(message):
     name = user_data[chat_id]["name"]
     age = user_data[chat_id]["age"]
     studio = user_data[chat_id]["studio"]
-
+    group = user_data[chat_id]["group"]
     bot.send_message(
     ADMIN_ID,
     f"🔔 Новая заявка на пробное занятие\n\n"
     f"Имя: {name}\n"
     f"Возраст: {age}\n"
-    f"Группа: {'🧒 Детская группа (4-8 лет)' if 4 <= age <= 8 else '🧑 Старшая группа'}\n"
+    f"Группа: {group}\n"
     f"Филиал: {studio}\n"
     f"Телефон: {phone}"
     )
@@ -263,7 +263,7 @@ def answer(message):
     else:
      group = "🧑 Старшая группа"
      user_data[chat_id]["age"] = age
-
+     user_data[chat_id]["group"] = group
      markup = types.InlineKeyboardMarkup()
 
     btn1 = types.InlineKeyboardButton(
