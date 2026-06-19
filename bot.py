@@ -43,11 +43,14 @@ def start(message):
         "💬 WhatsApp",
         callback_data="whatsapp"
     )
-
+    btn7 = types.InlineKeyboardButton(
+    "📸 Instagram",
+    url="https://instagram.com/studiofirst90_almaty"
+    )
     markup.add(btn1)
     markup.row(btn2, btn3)
     markup.row(btn4, btn5)
-    markup.row(btn6)
+    markup.row(btn6, btn7)
 
     bot.send_message(
         message.chat.id,
