@@ -116,16 +116,23 @@ def contact_handler(message):
         data["studio"],
         phone
     )
-
+    if data["studio"] == "Боткина 20":
+        if data["group"] == "👶 Детская группа":
+            schedule = "Вт, Чт 18:30-20:00"
+        else:
+            schedule = "Вт, Чт 20:00-21:30"
+    else:
+        schedule = "Пн, Ср, Пт 19:30-20:30"
     bot.send_message(
-        ADMIN_ID,
-        f"🔔 Новая заявка\n\n"
-        f"👶 Имя: {data['name']}\n"
-        f"🎂 Возраст: {data['age']}\n"
-        f"🏆 Группа: {data['group']}\n"
-        f"📍 Филиал: {data['studio']}\n"
-        f"📱 Телефон: {phone}"
-    )
+            ADMIN_ID,
+            f"🔔 Новая заявка\n\n"
+            f"👶 Имя: {data['name']}\n"
+            f"🎂 Возраст: {data['age']}\n"
+            f"🏆 Группа: {data['group']}\n"
+            f"📅 Расписание: {schedule}\n"
+            f"📍 Филиал: {data['studio']}\n"
+            f"📱 Телефон: {phone}"
+        )
 
     bot.send_message(
         chat_id,
