@@ -1,290 +1,257 @@
 import telebot
 from telebot import types
+import csv
+from datetime import datetime
 
 TOKEN = "8858237214:AAFR9q9NrBlnvk9iVmw_lKj5ozqEdrc2cXE"
 ADMIN_ID = 1902991988
 
-bot = telebot.TeleBot(TOKEN)
+WHATSAPP = "https://wa.me/77773967698"
+INSTAGRAM = "https://instagram.com/studiofirst90_almaty"
 
+bot = telebot.TeleBot(TOKEN)
 user_data = {}
 
+def save_lead(name, age, group, studio, phone):
+    with open("leads.csv", "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f, delimiter=";")
+        writer.writerow([
+            datetime.now().strftime("%d.%m.%Y %H:%M"),
+            name, age, group, studio, phone
+        ])
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=["start"])
 def start(message):
 
     markup = types.InlineKeyboardMarkup(row_width=2)
 
-    btn1 = types.InlineKeyboardButton(
-        "🎁 Пробное занятие",
-        callback_data="register"
+    markup.add(
+        types.InlineKeyboardButton("🎁 Пробное занятие", callback_data="trial")
     )
 
-    btn2 = types.InlineKeyboardButton(
-        "📅 Расписание",
-        callback_data="schedule"
+    markup.row(
+        types.InlineKeyboardButton("📅 Расписание", callback_data="schedule"),
+        types.InlineKeyboardButton("💰 Стоимость", callback_data="price")
     )
 
-    btn3 = types.InlineKeyboardButton(
-        "💰 Стоимость",
-        callback_data="price"
+    markup.row(
+        types.InlineKeyboardButton("📍 Филиалы", callback_data="branches"),
+        types.InlineKeyboardButton("📞 Контакты", callback_data="contacts")
     )
 
-    btn4 = types.InlineKeyboardButton(
-        "📍 Филиалы",
-        callback_data="address"
+    markup.row(
+        types.InlineKeyboardButton("💬 WhatsApp", url=WHATSAPP),
+        types.InlineKeyboardButton("📸 Instagram", url=INSTAGRAM)
     )
-
-    btn5 = types.InlineKeyboardButton(
-        "📞 Контакты",
-        callback_data="contacts"
-    )
-
-    btn6 = types.InlineKeyboardButton(
-        "💬 WhatsApp",
-        callback_data="whatsapp"
-    )
-    btn7 = types.InlineKeyboardButton(
-    "📸 Instagram",
-    url="https://instagram.com/studiofirst90_almaty"
-    )
-    markup.add(btn1)
-    markup.row(btn2, btn3)
-    markup.row(btn4, btn5)
-    markup.row(btn6, btn7)
 
     bot.send_message(
         message.chat.id,
         "💃 Добро пожаловать в студию танцев First!\n\n"
         "✨ Первое пробное занятие бесплатно\n\n"
-        "Выберите действие:",
+        "🏆 Дети и взрослые\n"
+        "🏫 2 филиала в Алматы\n\n"
+        "Выберите действие 👇",
         reply_markup=markup
     )
-
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
 
     chat_id = call.message.chat.id
 
-    if call.data == "register":
+    if call.data == "trial":
 
-        user_data[chat_id] = {"step": "name"}
+        user_data[chat_id] = {}
+
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("👧 4-8 лет", callback_data="age_child"))
+        markup.add(types.InlineKeyboardButton("🕺 9+ лет и взрослые", callback_data="age_adult"))
 
         bot.send_message(
             chat_id,
-            "Введите имя ребенка"
+            "Выберите возрастную группу:",
+            reply_markup=markup
+        )
+
+    elif call.data == "age_child":
+
+        user_data[chat_id]["group"] = "👧 Детская группа (4-8 лет)"
+
+        show_branches(chat_id)
+
+    elif call.data == "age_adult":
+
+        user_data[chat_id]["group"] = "🕺 Старшие дети и взрослые"
+
+        show_branches(chat_id)
+
+    elif call.data == "schedule":
+
+        bot.send_message(
+            chat_id,
+            "🗓️ РАСПИСАНИЕ\n\n"
+            "📍 Боткина 20\n"
+            "👧 Детская группа\n"
+            "Вт, Чт — 18:30-20:00\n\n"
+            "🕺 Старшие дети и взрослые\n"
+            "Вт, Чт — 20:00-21:30\n\n"
+            "📍 Потанина 226 (Школа №102)\n"
+            "👨‍👩‍👧 Общая группа\n"
+            "Пн, Ср, Пт — 19:30-20:30"
+        )
+
+    elif call.data == "price":
+
+        bot.send_message(
+            chat_id,
+            "💰 СТОИМОСТЬ\n\n"
+            "27 000 ₸ в месяц\n\n"
+            "🎁 Первое пробное занятие бесплатно"
+        )
+
+    elif call.data == "branches":
+
+        bot.send_message(
+            chat_id,
+            "📍 НАШИ ФИЛИАЛЫ\n\n"
+            "🏫 Потанина 226 (Школа №102)\n"
+            "🏫 Боткина 20"
         )
 
     elif call.data == "contacts":
 
         bot.send_message(
             chat_id,
-            "📞 Телефон:\n+7 777 396 76 98"
+            "📞 +7 777 396 76 98\n\n"
+            "💬 WhatsApp:\n" + WHATSAPP
         )
 
-    elif call.data == "address":
-
-        bot.send_message(
-            chat_id,
-            "📍 Наши филиалы:\n\n"
-            "🏫 Потанина 226\n"
-            "🏫 Боткина 20"
-        )
-
-    elif call.data == "schedule":
-
-     bot.send_message(
-        chat_id,
-        "🗓️ Расписание занятий\n\n"
-
-        "📍 Боткина, 20\n"
-        "👧 Детская группа\n"
-        "Вторник, четверг — 18:30-20:00\n\n"
-
-        "🕺 Старшие дети и взрослые\n"
-        "Вторник, четверг — 20:00-21:30\n\n"
-
-        "📍 Потанина, 226 (школа №102)\n"
-        "👨‍👩‍👧 Общая группа\n"
-        "Понедельник, среда, пятница — 19:30-20:30"
-    )
-
-    elif call.data == "price":
-
-     bot.send_message(
-        chat_id,
-        "💰 Стоимость:\n\n"
-        "🏫 Потанина 226\n"
-        "12 занятий по 1 часу — 27 000 ₸\n\n"
-        "🏫 Боткина 20\n"
-        "8 занятий по 1.5 часа — 27 000 ₸\n\n"
-        "🎁 Первое пробное занятие бесплатно"
-    )
-
-    elif call.data == "whatsapp":
-
-        markup = types.InlineKeyboardMarkup()
-
-        btn = types.InlineKeyboardButton(
-            "📲 Написать в WhatsApp",
-            url="https://wa.me/77773967698"
-        )
-
-        markup.add(btn)
-
-        bot.send_message(
-            chat_id,
-            "Связаться с администратором:",
-            reply_markup=markup
-        )
-
-    elif call.data == "studio1":
+    elif call.data == "studio_potanina":
 
         user_data[chat_id]["studio"] = "Потанина 226"
 
-        phone_markup = types.ReplyKeyboardMarkup(
-            resize_keyboard=True,
-            one_time_keyboard=True
-        )
-
-        phone_btn = types.KeyboardButton(
-            "📱 Отправить телефон",
-            request_contact=True
-        )
-
-        phone_markup.add(phone_btn)
-
-        bot.send_message(
+        request_phone(
             chat_id,
-            "Отправьте номер телефона родителя",
-            reply_markup=phone_markup
+            "🎉 Отличный выбор!\n\n"
+            "📍 Потанина 226 (Школа №102)\n\n"
+            "📅 Пн, Ср, Пт\n"
+            "⏰ 19:30 - 20:30\n\n"
+            "💰 27 000 ₸\n"
+            "🎁 Первое занятие бесплатно\n\n"
+            "📱 Отправьте номер телефона родителя."
         )
 
-    elif call.data == "studio2":
+    elif call.data == "studio_botkina":
 
         user_data[chat_id]["studio"] = "Боткина 20"
 
-        phone_markup = types.ReplyKeyboardMarkup(
-            resize_keyboard=True,
-            one_time_keyboard=True
-        )
+        group = user_data[chat_id]["group"]
 
-        phone_btn = types.KeyboardButton(
+        if "Детская" in group:
+            text = (
+                "🎉 Отличный выбор!\n\n"
+                "📍 Боткина 20\n\n"
+                "👧 Детская группа\n"
+                "📅 Вт, Чт\n"
+                "⏰ 18:30 - 20:00\n\n"
+                "💰 27 000 ₸\n"
+                "🎁 Первое занятие бесплатно\n\n"
+                "📱 Отправьте номер телефона родителя."
+            )
+        else:
+            text = (
+                "🎉 Отличный выбор!\n\n"
+                "📍 Боткина 20\n\n"
+                "🕺 Старшие дети и взрослые\n"
+                "📅 Вт, Чт\n"
+                "⏰ 20:00 - 21:30\n\n"
+                "💰 27 000 ₸\n"
+                "🎁 Первое занятие бесплатно\n\n"
+                "📱 Отправьте номер телефона родителя."
+            )
+
+        request_phone(chat_id, text)
+
+def show_branches(chat_id):
+
+    markup = types.InlineKeyboardMarkup()
+
+    markup.add(
+        types.InlineKeyboardButton("🏫 Потанина 226", callback_data="studio_potanina")
+    )
+
+    markup.add(
+        types.InlineKeyboardButton("🏫 Боткина 20", callback_data="studio_botkina")
+    )
+
+    bot.send_message(
+        chat_id,
+        "Выберите филиал 👇",
+        reply_markup=markup
+    )
+
+def request_phone(chat_id, text):
+
+    phone_markup = types.ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+
+    phone_markup.add(
+        types.KeyboardButton(
             "📱 Отправить телефон",
             request_contact=True
         )
+    )
 
-        phone_markup.add(phone_btn)
+    bot.send_message(
+        chat_id,
+        text,
+        reply_markup=phone_markup
+    )
 
-        bot.send_message(
-            chat_id,
-            "Отправьте номер телефона родителя",
-            reply_markup=phone_markup
-        )
-
-
-@bot.message_handler(content_types=['contact'])
+@bot.message_handler(content_types=["contact"])
 def contact_handler(message):
 
     chat_id = message.chat.id
 
-    if chat_id not in user_data:
-        return
-
     phone = message.contact.phone_number
 
-    name = user_data[chat_id]["name"]
-    age = user_data[chat_id]["age"]
-    studio = user_data[chat_id]["studio"]
     group = user_data[chat_id]["group"]
+    studio = user_data[chat_id]["studio"]
+
+    save_lead(
+        "Заявка из Telegram",
+        "-",
+        group,
+        studio,
+        phone
+    )
+
     bot.send_message(
-    ADMIN_ID,
-    f"🔔 Новая заявка на пробное занятие\n\n"
-    f"Имя: {name}\n"
-    f"Возраст: {age}\n"
-    f"Группа: {group}\n"
-    f"Филиал: {studio}\n"
-    f"Телефон: {phone}"
+        ADMIN_ID,
+        f"🔔 Новая заявка\n\n"
+        f"Группа: {group}\n"
+        f"Филиал: {studio}\n"
+        f"Телефон: {phone}"
     )
 
     markup = types.InlineKeyboardMarkup()
-
-    wa_btn = types.InlineKeyboardButton(
-        "💬 Написать в WhatsApp",
-        url="https://wa.me/77773967698"
+    markup.add(
+        types.InlineKeyboardButton(
+            "💬 Написать в WhatsApp",
+            url=WHATSAPP
+        )
     )
-
-    markup.add(wa_btn)
 
     bot.send_message(
         chat_id,
-        "✅ Спасибо!\n\n"
-        "Заявка отправлена.\n"
-        "Наш администратор скоро свяжется с вами.",
+        "✅ Заявка успешно отправлена!\n\n"
+        "Спасибо за интерес к студии танцев First 💃\n\n"
+        "Наш администратор свяжется с вами в ближайшее время.",
         reply_markup=markup
     )
 
-    del user_data[chat_id]
+    user_data.pop(chat_id, None)
 
-
-@bot.message_handler(func=lambda message: True)
-def answer(message):
-
-    chat_id = message.chat.id
-
-    if chat_id not in user_data:
-        return
-
-    step = user_data[chat_id]["step"]
-
-    if step == "name":
-
-        user_data[chat_id]["name"] = message.text
-        user_data[chat_id]["step"] = "age"
-
-        bot.send_message(
-            chat_id,
-            "Введите возраст ребенка"
-        )
-
-    elif step == "age":
-
-        if not message.text.isdigit():
-
-            bot.send_message(
-                chat_id,
-                "Введите возраст цифрами"
-            )
-            return
-
-        age = int(message.text)
-    if 4 <= age <= 8:
-     group = "👶 Детская группа (4–8 лет)"
-    else:
-     group = "🧑 Старшая группа"
-     user_data[chat_id]["age"] = age
-     user_data[chat_id]["group"] = group
-     markup = types.InlineKeyboardMarkup()
-
-    btn1 = types.InlineKeyboardButton(
-            "🏫 Потанина 226",
-            callback_data="studio1"
-        )
-
-    btn2 = types.InlineKeyboardButton(
-            "🏫 Боткина 20",
-            callback_data="studio2"
-        )
-
-    markup.add(btn1)
-    markup.add(btn2)
-
-    bot.send_message(
-            chat_id,
-            "🎉 Отлично!\n\n"
-            "Выберите филиал:",
-            reply_markup=markup
-        )
-
-
-bot.infinity_polling()
+bot.infinity_polling(skip_pending=True)
